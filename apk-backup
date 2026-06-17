@@ -1,0 +1,61 @@
+#!/bin/sh
+#
+# apk-backup - manage a backup list of installed apk packages
+#
+# Lives under /etc/config/ so it survives sysupgrade backups
+# (hidden filename so uci does not try to parse it as a config).
+#
+# Usage:
+#   .apk-backup backup    write currently installed packages to .apk-backup.out
+#   .apk-backup restore   install all packages listed in .apk-backup.out
+#   .apk-backup help      show this help
+
+OUT="/etc/config/.apk-backup.out"
+
+usage() {
+	cat <<-EOF
+	Usage: $0 {backup|restore|help}
+
+	  backup   List all currently installed apk packages and save to:
+	             $OUT
+
+	  restore  Install every package listed in:
+	             $OUT
+	           (useful after a reflash/reset)
+
+	  help     Show this help text
+	EOF
+}
+
+cmd_backup() {
+	ls /overlay/upper/lib/apk/packages/*.list 2>/dev/null \
+		| sed -e 's#.*/##' -e 's/\.list$//' > "$OUT"
+	count=$(wc -l < "$OUT")
+	echo "Saved $count package names to $OUT"
+}
+
+cmd_restore() {
+	if [ ! -s "$OUT" ]; then
+		echo "Error: $OUT not found or empty. Run 'backup' first (on the source device)." >&2
+		exit 1
+	fi
+	echo "Installing $(wc -l < "$OUT") packages from $OUT ..."
+	xargs apk add < "$OUT"
+}
+
+case "$1" in
+	backup)
+		cmd_backup
+		;;
+	restore)
+		cmd_restore
+		;;
+	help|-h|--help|"")
+		usage
+		;;
+	*)
+		echo "Unknown option: $1" >&2
+		usage
+		exit 1
+		;;
+esac
