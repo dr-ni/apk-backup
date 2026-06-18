@@ -19,9 +19,9 @@ ssh root@openwrt chmod +x /etc/config/.apk-backup
 ## Usage
 
 ```sh
-/etc/config/.apk-backup -b | --backup | backup     # write currently installed packages to .apk-backup.out
-/etc/config/.apk-backup -r | --restore | restore   # install all packages listed in .apk-backup.out
-/etc/config/.apk-backup -h | --help | help         # show help text
+/etc/config/.apk-backup -b | --backup     # write currently installed packages to .apk-backup.out
+/etc/config/.apk-backup -r | --restore    # install all packages listed in .apk-backup.out
+/etc/config/.apk-backup -h | --help       # show help text
 ```
 
 Output file: `/etc/config/.apk-backup.out`
