@@ -1,8 +1,12 @@
 # apk-backup
 
-A small POSIX shell script for OpenWrt that backs up the
-list of currently installed `apk` packages and can restore them after a
-reflash or import.
+`apk-backup` - a small POSIX shell script for OpenWrt that backs up
+`/etc/apk/world` (the explicitly installed top-level packages, as tracked
+by apk itself) and can restore them after a reflash or reset. Because only
+the explicitly requested packages are saved - not packages that were merely
+pulled in as dependencies - `apk add` resolves the correct dependency set
+fresh against the repos of the release you're restoring onto, instead of
+force-installing packages that a newer release no longer needs.
 
 The script is meant to live as a hidden file under `/etc/config/` so that:
 
@@ -19,27 +23,26 @@ ssh root@openwrt chmod +x /etc/config/.apk-backup
 ## Usage
 
 ```sh
-/etc/config/.apk-backup -b | --backup     # write currently installed packages to .apk-backup.out
-/etc/config/.apk-backup -r | --restore    # install all packages listed in .apk-backup.out
-/etc/config/.apk-backup -h | --help       # show help text
+.apk-backup -b | --backup | backup     # write currently installed packages to .apk-backup.out
+.apk-backup -r | --restore | restore   # install all packages listed in .apk-backup.out
+.apk-backup -h | --help | help         # show help text
 ```
 
-Output file: `/etc/config/.apk-backup.out`
+Output file: `/etc/config/.apk-backup.out` (a copy of `/etc/apk/world` at backup time)
 
 ### Example: scheduled backup via cron
 
 ```sh
 echo '0 3 * * * /etc/config/.apk-backup -b' >> /etc/crontabs/root
 ```
-If you make a backup of your OpenWrt settings it will also include all manually added packages.
 
-### Restore
+### Restore after reflash
 
-After a fresh OpenWrt install, import your backup via LuCi or copy manually `.apk-backup.out` back to
+After a fresh OpenWrt install, copy `.apk-backup.out` back to
 `/etc/config/` and run:
 
 ```sh
-/etc/config/.apk-backup -r
+.apk-backup -r
 ```
 
 ## License
