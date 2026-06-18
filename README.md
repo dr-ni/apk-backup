@@ -1,6 +1,6 @@
 # apk-backup
 
-apk-backup - a small POSIX shell script for OpenWrt that backs up the
+A small POSIX shell script for OpenWrt that backs up the
 list of currently installed `apk` packages and can restore them after a
 reflash or import.
 
