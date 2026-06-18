@@ -6,15 +6,15 @@
 # (hidden filename so uci does not try to parse it as a config).
 #
 # Usage:
-#   .apk-backup -b|--backup|backup     write currently installed packages to .apk-backup.out
-#   .apk-backup -r|--restore|restore   install all packages listed in .apk-backup.out
-#   .apk-backup -h|--help|help         show this help
+#   .apk-backup -b | --backup     write currently installed packages to .apk-backup.out
+#   .apk-backup -r | --restore    install all packages listed in .apk-backup.out
+#   .apk-backup -h | --help       show this help
 
 OUT="/etc/config/.apk-backup.out"
 
 usage() {
 	cat <<-EOF
-	Usage: $0 {-b|--backup|backup | -r|--restore|restore | -h|--help|help}
+	Usage: $0 {-b | --backup | -r | --restore | -h | --help}
 
 	  -b, --backup, backup    List all currently installed apk packages and save to:
 	                            $OUT
