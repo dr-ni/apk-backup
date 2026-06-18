@@ -19,9 +19,9 @@ ssh root@openwrt chmod +x /etc/config/.apk-backup
 ## Usage
 
 ```sh
-.apk-backup backup    # write currently installed packages to .apk-backup.out
-.apk-backup restore   # install all packages listed in .apk-backup.out
-.apk-backup help      # show help text
+.apk-backup -b | --backup | backup     # write currently installed packages to .apk-backup.out
+.apk-backup -r | --restore | restore   # install all packages listed in .apk-backup.out
+.apk-backup -h | --help | help         # show help text
 ```
 
 Output file: `/etc/config/.apk-backup.out`
@@ -29,7 +29,7 @@ Output file: `/etc/config/.apk-backup.out`
 ### Example: scheduled backup via cron
 
 ```sh
-echo '0 3 * * * /etc/config/.apk-backup backup' >> /etc/crontabs/root
+echo '0 3 * * * /etc/config/.apk-backup -b' >> /etc/crontabs/root
 ```
 
 ### Restore after reflash
@@ -38,7 +38,7 @@ After a fresh OpenWrt install, copy `.apk-backup.out` back to
 `/etc/config/` and run:
 
 ```sh
-.apk-backup restore
+.apk-backup -r
 ```
 
 ## License
