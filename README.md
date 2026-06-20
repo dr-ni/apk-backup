@@ -115,8 +115,8 @@ This will:
 **Verify on your dev machine, not on the router.** OpenWrt does not
 ship `gpg` by default, and installing GnuPG on the router itself
 pulls in a large dependency chain that's usually not worth it just
-for one-off verification. Verify where you already have `gpg` set up
-(e.g. `uwepc`/`unuc`, the same machine used for Trezor-GPG-signed git
+for one-off verification. Verify where you already have `gpg` set up,
+the same machine used for Trezor-GPG-signed git
 commits/tags), then copy the verified `.apk` to the router.
 
 ```sh
