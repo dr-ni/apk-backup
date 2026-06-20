@@ -1,50 +1,205 @@
-# apk-backup
+# Onboard 1.4.4-2
 
-`apk-backup` - a small POSIX shell script for OpenWrt that backs up
-`/etc/apk/world` (the explicitly installed top-level packages, as tracked
-by apk itself) and can restore them after a reflash or reset. Because only
-the explicitly requested packages are saved - not packages that were merely
-pulled in as dependencies - `apk add` resolves the correct dependency set
-fresh against the repos of the release you're restoring onto, instead of
-force-installing packages that a newer release no longer needs.
+![onb](https://github.com/onboard-osk/onboard/blob/main/onboard.png)
 
-The script is meant to live as a hidden file under `/etc/config/` so that:
+![onb](https://github.com/onboard-osk/onboard/blob/main/Onboard.gif)
 
-- it survives `sysupgrade` backups (which include the whole `/etc/config/` tree)
-- `uci` does not try to parse it as a config file (hidden filename)
+## Description
 
-## Installation
+Onboard is an on-screen keyboard designed for users who cannot easily use
+a physical keyboard, including tablet users and people with mobility impairments.
+It works out of the box without requiring manual configuration,
+automatically reading the keyboard layout from the X server.
 
-```sh
-scp apk-backup root@openwrt:/etc/config/.apk-backup
-ssh root@openwrt chmod +x /etc/config/.apk-backup
-```
+Onboard supports both X11/Xorg and Wayland. Native Wayland key injection
+is provided via the `zwp_virtual_keyboard_unstable_v1` protocol, supported
+by sway, KDE Plasma >= 5.25, GNOME >= 45, Hyprland, labwc, and other
+wlroots-based compositors.
 
-## Usage
+To run on Wayland:
 
-```sh
-.apk-backup -b | --backup | backup     # write currently installed packages to .apk-backup.out
-.apk-backup -r | --restore | restore   # install all packages listed in .apk-backup.out
-.apk-backup -h | --help | help         # show help text
-```
+        GDK_BACKEND=wayland ONBOARD_ALLOW_WAYLAND=1 onboard
 
-Output file: `/etc/config/.apk-backup.out` (a copy of `/etc/apk/world` at backup time)
+See [README_Wayland.md](README_Wayland.md) for full setup instructions,
+compositor compatibility, and known limitations.
 
-### Example: scheduled backup via cron
+## Building from Source
+Find below short instructions on how to build Onboard straight from this
+github repository. If you have improvements to share, get errors or run
+into other problems, please let us know. Build instructions for
+new distributions are always welcome too.
 
-```sh
-echo '0 3 * * * /etc/config/.apk-backup -b' >> /etc/crontabs/root
-```
+### !!! First uninstall ALL onboard and mousetweaks packages !!!
 
-### Restore after reflash
+## Ubuntu and Debian:
+        # Uninstall
+        sudo apt purge onboard onboard-common onboard-data
+        sudo apt purge mousetweaks
 
-After a fresh OpenWrt install, copy `.apk-backup.out` back to
-`/etc/config/` and run:
+        # Note: It is recommended to build and install Debian packages see below.
 
-```sh
-.apk-backup -r
-```
+        # Install dependencies
+        sudo apt install git build-essential python3-packaging python3-dev
+        sudo apt install dh-python python3-distutils-extra devscripts pkg-config
+        sudo apt install libgtk-3-dev libxtst-dev libxkbfile-dev libdconf-dev libcanberra-dev
+        sudo apt install libhunspell-dev libudev-dev
+        sudo apt install libwayland-dev wayland-protocols libxkbcommon-dev
+
+        Next step is "Build and Install from Source"
+
+## Arch Linux:
+        # Uninstall
+        sudo pacman -S mousetweaks
+        sudo pacman -S onboard
+        
+        # Install dependencies
+        pacman -S base-devel git python-packaging python-distutils-extra dconf gtk3 \
+        libcanberra hunspell python-gobject gsettings-desktop-schemas \
+        iso-codes python-cairo librsvg python-dbus dbus-glib \
+        wayland wayland-protocols libxkbcommon
+
+        Next step is "Build and Install from Source"
+
+## Mageia:
+        # Install dependencies
+        urpmi git gcc-c++ lib64zlib-devel python3-distutils-extra
+        urpmi libgtk+3.0-devel libxtst-devel libxkbfile-devel libdconf-devel
+        urpmi libhunspell-devel libcanberra-devel libpython3-devel intltool
+        # more or less optional, but recommended for full functionality
+        urpmi lib64atspi-gir2.0 at-spi2-core-qt python3-dbus qtatspi-plugin
+
+        Next step is "Build and Install from Source"
+
+## Fedora Xfce:
+        # Install dependencies
+        sudo dnf install python3-distutils-extra dconf-devel intltool
+        sudo dnf install libcanberra-devel libxkbfile-devel libXtst-devel
+        sudo dnf install hunspell-devel python3-devel intltool gcc-c++ gcc
+        sudo dnf install 'pkgconfig(udev)' 'pkgconfig(libudev)'
+        sudo dnf install wayland-devel wayland-protocols-devel libxkbcommon-devel
+
+        Next step is "Build and Install from Source"
+
+
+## openSUSE Xfce:
+        # Install dependencies
+        sudo zypper install python3-distutils-extra dconf-devel intltool
+        sudo zypper install libcanberra-devel libxkbfile-devel libXtst-devel
+        sudo zypper install hunspell-devel python3-devel intltool gcc-c++ gcc
+        sudo zypper install 'pkgconfig(udev)' 'pkgconfig(libudev)'
+        sudo zypper install wayland-devel wayland-protocols-devel libxkbcommon-devel
+
+        Next step is "Build and Install from Source"
+
+## FreeBSD (not officially supported)
+        See `README.FreeBSD.md` for build instructions.
+
+
+## Build and Install from Source
+        git clone https://github.com/onboard-osk/onboard
+        cd onboard
+        python3 setup.py clean
+        python3 setup.py build
+        
+        # System-wide installation (requires root access):
+        sudo python3 setup.py install
+
+## Uninstall if installed from Source
+        # System-wide uninstall (requires root access):
+        sudo python3 setup.py uninstall
+        
+## Build and Install Debian Packages
+
+To build Debian packages from the source, two scripts are available:
+- `build_debs.sh`: Creates the `.deb` packages and related metadata.
+- `apt_install_debs.sh`: Sets up a local repository and installs the packages on a target system.
+
+---
+
+### Notes
+- Both scripts automatically use `sudo` to install dependencies or packages.
+- Ensure you have `sudo` privileges and be ready to enter your password when prompted during execution.
+
+---
+
+### Build Debian Packages
+
+The `build_debs.sh` script automates building `.deb` packages and associated metadata in **./build/debs**
+
+#### Steps:
+   - Execute:
+     ```bash
+     /bin/sh ./build_debs.sh
+     ```
+
+The Debian packages will be saved in the directory: `/path/to/onboard_sources/build/debs` 
+
+---
+
+### Install the Debian Packages
+
+The `apt_install_debs.sh` script simplifies installing the generated `.deb` packages using a local repository.
+
+#### Steps:
+   - If the target system is the build system:
+      - Execute:
+     ```bash
+     /bin/sh ./apt_install_debs.sh
+     ```
+   - If the target system is not the build system copy this files to a directory on the target:
+     - All `build/debs/*.deb` files.
+     - The `build/debs/Packages` file.
+     - The `apt_install_debs.sh` script.
+     - Execute in the directory on the target system:
+     ```bash
+     /bin/sh ./apt_install_debs.sh
+     ```
+        
+### Uninstall the Debian Packages
+   - Execute:
+     ```bash
+     /bin/sh ./apt_install_debs.sh "remove"
+     ```
+## Manuals
+
+        # Terminal
+        man onboard
+        onboard -h
+        
+        # Interactive
+        yelp "help:onboard"
+        xdg-open "help:onboard"
+
+        # Onboard
+        # Right click on icon in systray -> Help 
+
+        # Change keyboard language layout
+        # setxkbmap -layout de
+        # or [us|in|ru|...]
+        # 
+        # ISO (pc105) / ANSI (pc104) examples:
+        # setxkbmap -model pc105 -layout de
+        # setxkbmap -model pc104 -layout us
+
+## D-Bus interface
+
+The Onboard D-Bus interface allows communication between Onboard and other processes running concurrently on the Linux desktop.
+
+Here the Interface description:
+[DBUS.md](https://github.com/onboard-osk/onboard/blob/main/DBUS.md)
+
+## Mousetweaks
+
+This optional package provides mouse accessibility enhancements for the GNOME desktop.
+It offers a way to perform clicks without using any physical mouse buttons (Hover Click).
+The package is also available in various package managers. However, it is often
+not working anymore with onboard. In this case a manual installation from https://github.com/onboard-osk/mousetweaks should help.
+
+## Homepage
+https://github.com/onboard-osk/onboard
+
+## Reporting Bugs
+https://github.com/onboard-osk/onboard/issues
 
 ## License
-
-GPLv3, see [LICENSE](LICENSE).
+This program is released under the terms of the GNU General Public License. Please see the file COPYING for details.
