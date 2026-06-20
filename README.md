@@ -121,9 +121,8 @@ SSH/GPG agent interface). So `apk add` on the router still needs
 |                          | apk package                          | hidden script                          |
 |--------------------------|---------------------------------------|------------------------------------------|
 | Setup effort             | one `apk add`                        | manual `scp` + `chmod` after every reinstall |
-| Survives `sysupgrade`?   | yes - reinstalled like any other package | yes - hidden file under `/etc/config/` |
+| Survives `sysupgrade`?   | yes - but only the backup list | yes - hidden file under `/etc/config/` |
 | On `$PATH`?              | yes - `apk-backup` from anywhere     | no - needs the full `/etc/config/.apk-backup` path |
-| Trust/signature          | can be verified before install (GPG-signed release) | none - you're trusting the raw file as copied |
 | Dependency tracking      | shows up in `apk info`/`apk list -I`, gets removed cleanly via `apk del` | invisible to apk, manual cleanup only |
 | Build/update step needed | yes - new `.apk` per version (or just download the release) | no - edit the file directly |
 
