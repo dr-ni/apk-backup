@@ -176,7 +176,7 @@ echo '0 3 * * * /etc/config/.apk-backup -b' >> /etc/crontabs/root
 
 ### Restore after reflash
 
-After a fresh OpenWrt install, copy `.apk-backup.out` back to
+After a fresh OpenWrt install, restore your LuCi backup with your `.apk-backup.out` or copy `.apk-backup.out` back via scp to
 `/etc/config/` and run:
 
 Installed as an apk package:
