@@ -88,8 +88,8 @@ This produces `apk-backup-1.0-r1.apk` in the `pkgbuild/` directory.
 **3. Copy the built package to the router and install it:**
 
 ```sh
-scp-openwrt apk-backup-1.0-r1.apk root@OpenWrt:/tmp/
-ssh-openwrt
+scp apk-backup-1.0-r1.apk root@OpenWrt:/tmp/
+ssh
 apk add --allow-untrusted /tmp/apk-backup-1.0-r1.apk
 ```
 
