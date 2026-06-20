@@ -38,7 +38,7 @@ see [Verifying a release](#verifying-a-release)):
 
 ```sh
 scp apk-backup-<version>.apk root@OpenWrt:/tmp/
-ssh openwrt
+ssh root@openwrt
 apk add --allow-untrusted /tmp/apk-backup-<version>.apk
 ```
 
