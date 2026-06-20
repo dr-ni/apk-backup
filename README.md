@@ -13,14 +13,38 @@ The script is meant to live as a hidden file under `/etc/config/` so that:
 - it survives `sysupgrade` backups (which include the whole `/etc/config/` tree)
 - `uci` does not try to parse it as a config file (hidden filename)
 
+Pre-built, signed releases: **https://github.com/dr-ni/apk-backup/releases**
+
 ## Installation
+
+### Recommended: install the pre-built apk package
+
+Signed releases (Trezor-GPG-signed `.apk` + detached `.asc` signature)
+are published at:
+
+**https://github.com/dr-ni/apk-backup/releases**
+
+```sh
+scp-openwrt apk-backup-<version>.apk root@OpenWrt:/tmp/
+ssh-openwrt
+apk add --allow-untrusted /tmp/apk-backup-<version>.apk
+```
+
+(See [Verifying a release](#verifying-a-release) below to check the
+signature before installing.)
+
+This installs the script to `/usr/sbin/apk-backup`, so it's available
+on `$PATH` as `apk-backup` - no manual file placement, dot-prefix, or
+chmod needed.
+
+### Alternative: install the hidden script manually
 
 ```sh
 scp apk-backup root@openwrt:/etc/config/.apk-backup
 ssh root@openwrt chmod +x /etc/config/.apk-backup
 ```
 
-### As an apk package
+### Building the apk package yourself
 
 `pkgbuild/build.sh` builds an installable `.apk` package using `apk mkpkg`.
 
@@ -60,11 +84,35 @@ ssh-openwrt
 apk add --allow-untrusted /tmp/apk-backup-1.0-r1.apk
 ```
 
-This installs the script to `/usr/sbin/apk-backup`, so it's available
-on `$PATH` as `apk-backup` (no leading `./`, no hidden-file dot-prefix,
-no full path needed). Note: this installs the script itself as a
-package - the backup output file is still the hidden file under
-`/etc/config/`, as described below.
+### Releasing a signed package (GitHub release, Trezor-signed)
+
+`pkgbuild/release.sh` builds the package and publishes it as a GitHub
+release asset with a detached GPG signature, using the same
+Trezor-backed GPG key as the onboard-osk/onboard releases.
+
+```sh
+cd pkgbuild
+./release.sh v1.0-r1
+```
+
+This will:
+1. run `build.sh`
+2. `gpg --detach-sign --armor` the resulting `.apk` (Trezor confirmation required)
+3. create a signed git tag (`git tag -s`, Trezor confirmation required)
+4. create a GitHub release via `gh release create`, uploading both
+   the `.apk` and its `.apk.asc` signature
+
+### Verifying a release
+
+```sh
+gpg --verify apk-backup-<version>.apk.asc apk-backup-<version>.apk
+```
+
+This signs the release asset, not the apk-tools v3 package format
+itself (apk-tools' own `--sign-key` mechanism needs a plain RSA key
+file it can load directly, which isn't compatible with the Trezor's
+SSH/GPG agent interface). So `apk add` on the router still needs
+`--allow-untrusted` regardless of the GPG-signed release.
 
 ## Usage
 
