@@ -89,8 +89,7 @@ This produces `apk-backup-1.0-r1.apk` in the `pkgbuild/` directory.
 
 ```sh
 scp apk-backup-1.0-r1.apk root@OpenWrt:/tmp/
-ssh
-apk add --allow-untrusted /tmp/apk-backup-1.0-r1.apk
+ssh root@openwrt apk add --allow-untrusted /tmp/apk-backup-1.0-r1.apk
 ```
 
 ### Releasing a signed package (GitHub release, Trezor-signed)
