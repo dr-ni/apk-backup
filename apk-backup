@@ -38,6 +38,10 @@ usage() {
 }
 
 cmd_backup() {
+	if ! command -v apk >/dev/null 2>&1; then
+		echo "Error: 'apk' command not found. This script requires an apk-based OpenWrt system (23.05+)." >&2
+		exit 1
+	fi
 	if [ ! -s "$WORLD" ]; then
 		echo "Error: $WORLD not found or empty." >&2
 		exit 1
@@ -48,6 +52,10 @@ cmd_backup() {
 }
 
 cmd_restore() {
+	if ! command -v apk >/dev/null 2>&1; then
+		echo "Error: 'apk' command not found. This script requires an apk-based OpenWrt system (23.05+)." >&2
+		exit 1
+	fi
 	if [ ! -s "$OUT" ]; then
 		echo "Error: $OUT not found or empty. Run 'backup' first (on the source device)." >&2
 		exit 1
