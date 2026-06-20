@@ -120,7 +120,7 @@ SSH/GPG agent interface). So `apk add` on the router still needs
 
 |                          | apk package                          | hidden script                          |
 |--------------------------|---------------------------------------|------------------------------------------|
-| Setup effort             | one `apk add`                        | manual `scp` + `chmod` after every reinstall |
+| Setup effort             | upload via LuCi or scp `apk add`                        | manual `scp` + `chmod` after every reinstall |
 | Survives `sysupgrade`?   | yes - but only the backup list | yes - hidden file under `/etc/config/` |
 | On `$PATH`?              | yes - `apk-backup` from anywhere     | no - needs the full `/etc/config/.apk-backup` path |
 | Dependency tracking      | shows up in `apk info`/`apk list -I`, gets removed cleanly via `apk del` | invisible to apk, manual cleanup only |
