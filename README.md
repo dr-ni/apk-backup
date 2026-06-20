@@ -24,14 +24,23 @@ are published at:
 
 **https://github.com/dr-ni/apk-backup/releases**
 
+**Quickest: download directly on the router** (if it has internet access):
+
+| Step | Command |
+|---|---|
+| Download the release asset | `wget https://github.com/dr-ni/apk-backup/releases/download/<TAG>/apk-backup-<VERSION>.apk` |
+| Download the signature (optional) | `wget https://github.com/dr-ni/apk-backup/releases/download/<TAG>/apk-backup-<VERSION>.apk.asc` |
+| Install | `apk add --allow-untrusted apk-backup-<VERSION>.apk` |
+
+**Alternative: copy from your dev machine** (e.g. if the router has
+no internet access, or you've already downloaded it for verification -
+see [Verifying a release](#verifying-a-release)):
+
 ```sh
 scp-openwrt apk-backup-<version>.apk root@OpenWrt:/tmp/
 ssh-openwrt
 apk add --allow-untrusted /tmp/apk-backup-<version>.apk
 ```
-
-(See [Verifying a release](#verifying-a-release) below to check the
-signature before installing.)
 
 This installs the script to `/usr/sbin/apk-backup`, so it's available
 on `$PATH` as `apk-backup` - no manual file placement, dot-prefix, or
