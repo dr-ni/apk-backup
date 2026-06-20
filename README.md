@@ -63,7 +63,7 @@ must be built on a separate Linux machine with a full apk-tools 3.x,
 then copied to the router for installation. No OpenWrt SDK/toolchain
 is needed either way, since this package is just a shell script.
 
-**1. Build full apk-tools 3.x on your dev machine** (e.g. `uwepc`/`unuc`):
+**1. Build full apk-tools 3.x on your dev machine**
 
 ```sh
 sudo apt install meson ninja-build gcc pkg-config libssl-dev zlib1g-dev liblzma-dev libzstd-dev
