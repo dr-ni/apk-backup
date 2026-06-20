@@ -37,8 +37,8 @@ no internet access, or you've already downloaded it for verification -
 see [Verifying a release](#verifying-a-release)):
 
 ```sh
-scp-openwrt apk-backup-<version>.apk root@OpenWrt:/tmp/
-ssh-openwrt
+scp apk-backup-<version>.apk root@OpenWrt:/tmp/
+ssh root@openwrt
 apk add --allow-untrusted /tmp/apk-backup-<version>.apk
 ```
 
@@ -88,9 +88,8 @@ This produces `apk-backup-1.0-r1.apk` in the `pkgbuild/` directory.
 **3. Copy the built package to the router and install it:**
 
 ```sh
-scp-openwrt apk-backup-1.0-r1.apk root@OpenWrt:/tmp/
-ssh-openwrt
-apk add --allow-untrusted /tmp/apk-backup-1.0-r1.apk
+scp apk-backup-1.0-r1.apk root@OpenWrt:/tmp/
+ssh root@openwrt apk add --allow-untrusted /tmp/apk-backup-1.0-r1.apk
 ```
 
 ### Releasing a signed package (GitHub release, Trezor-signed)
@@ -153,7 +152,7 @@ SSH/GPG agent interface). So `apk add` on the router still needs
 
 |                          | apk package                          | hidden script                          |
 |--------------------------|---------------------------------------|------------------------------------------|
-| Setup effort             | upload via LuCi or scp `apk add`                        | manual `scp` + `chmod` after every reinstall |
+| Setup effort             | upload via LuCi wget or scp `apk add`                        | manual `scp` + `chmod` after every reinstall |
 | Survives `sysupgrade`?   | yes - but only the backup list | yes - hidden file under `/etc/config/` |
 | On `$PATH`?              | yes - `apk-backup` from anywhere     | no - needs the full `/etc/config/.apk-backup` path |
 | Dependency tracking      | shows up in `apk info`/`apk list -I`, gets removed cleanly via `apk del` | invisible to apk, manual cleanup only |
@@ -201,7 +200,7 @@ echo '0 3 * * * /etc/config/.apk-backup -b' >> /etc/crontabs/root
 
 ### Restore after reflash
 
-After a fresh OpenWrt install, copy `.apk-backup.out` back to
+After a fresh OpenWrt install, restore your LuCi backup with your `.apk-backup.out` or copy `.apk-backup.out` back via scp to
 `/etc/config/` and run:
 
 Installed as an apk package:
