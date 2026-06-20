@@ -37,8 +37,8 @@ no internet access, or you've already downloaded it for verification -
 see [Verifying a release](#verifying-a-release)):
 
 ```sh
-scp-openwrt apk-backup-<version>.apk root@OpenWrt:/tmp/
-ssh-openwrt
+scp apk-backup-<version>.apk root@OpenWrt:/tmp/
+ssh openwrt
 apk add --allow-untrusted /tmp/apk-backup-<version>.apk
 ```
 
