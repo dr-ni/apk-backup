@@ -68,12 +68,13 @@ package - the backup output file is still the hidden file under
 
 ## Usage
 
-If installed manually as the hidden script:
+If installed manually as the hidden script (run with the full path,
+or `cd /etc/config` first):
 
 ```sh
-.apk-backup -b | --backup | backup     # write currently installed packages to .apk-backup.out
-.apk-backup -r | --restore | restore   # install all packages listed in .apk-backup.out
-.apk-backup -h | --help | help         # show help text
+/etc/config/.apk-backup -b | --backup | backup     # write currently installed packages to .apk-backup.out
+/etc/config/.apk-backup -r | --restore | restore   # install all packages listed in .apk-backup.out
+/etc/config/.apk-backup -h | --help | help         # show help text
 ```
 
 If installed as an apk package, drop the leading dot (it's on `$PATH`):
@@ -100,7 +101,7 @@ After a fresh OpenWrt install, copy `.apk-backup.out` back to
 `/etc/config/` and run:
 
 ```sh
-.apk-backup -r
+/etc/config/.apk-backup -r
 ```
 
 (or `apk-backup -r` if installed as a package)
