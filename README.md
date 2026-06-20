@@ -116,32 +116,44 @@ SSH/GPG agent interface). So `apk add` on the router still needs
 
 ## Usage
 
+### Which install method to use
+
+|                          | apk package                          | hidden script                          |
+|--------------------------|---------------------------------------|------------------------------------------|
+| Setup effort             | one `apk add`                        | manual `scp` + `chmod` after every reinstall |
+| Survives `sysupgrade`?   | yes - reinstalled like any other package | yes - hidden file under `/etc/config/` |
+| On `$PATH`?              | yes - `apk-backup` from anywhere     | no - needs the full `/etc/config/.apk-backup` path |
+| Trust/signature          | can be verified before install (GPG-signed release) | none - you're trusting the raw file as copied |
+| Dependency tracking      | shows up in `apk info`/`apk list -I`, gets removed cleanly via `apk del` | invisible to apk, manual cleanup only |
+| Build/update step needed | yes - new `.apk` per version (or just download the release) | no - edit the file directly |
+
+The apk package is the better default for most cases: it's on
+`$PATH`, shows up as a real package, and (if installed from a signed
+release) gives you something to verify before trusting it. The hidden
+script is useful if you want to read or tweak the script directly on
+the router without rebuilding a package, or don't want to deal with
+`apk add`/`--allow-untrusted` at all.
+
+If installed as an apk package:
+
+```sh
+apk-backup -b | --backup | backup     # write currently installed packages to .apk-backup.out
+apk-backup -r | --restore | restore   # install all packages listed in .apk-backup.out
+apk-backup -h | --help | help         # show help text
+```
+
 If installed manually as the hidden script (run with the full path,
 or `cd /etc/config` first):
 
 ```sh
-/etc/config/.apk-backup -b | --backup | backup     # write currently installed packages to .apk-backup.out
-/etc/config/.apk-backup -r | --restore | restore   # install all packages listed in .apk-backup.out
-/etc/config/.apk-backup -h | --help | help         # show help text
-```
-
-If installed as an apk package, drop the leading dot (it's on `$PATH`):
-
-```sh
-apk-backup -b | --backup | backup
-apk-backup -r | --restore | restore
-apk-backup -h | --help | help
+/etc/config/.apk-backup -b | --backup | backup
+/etc/config/.apk-backup -r | --restore | restore
+/etc/config/.apk-backup -h | --help | help
 ```
 
 Output file: `/etc/config/.apk-backup.out` (a copy of `/etc/apk/world` at backup time)
 
 ### Example: scheduled backup via cron
-
-Hidden script:
-
-```sh
-echo '0 3 * * * /etc/config/.apk-backup -b' >> /etc/crontabs/root
-```
 
 Installed as an apk package:
 
@@ -149,21 +161,27 @@ Installed as an apk package:
 echo '0 3 * * * apk-backup -b' >> /etc/crontabs/root
 ```
 
+Hidden script:
+
+```sh
+echo '0 3 * * * /etc/config/.apk-backup -b' >> /etc/crontabs/root
+```
+
 ### Restore after reflash
 
 After a fresh OpenWrt install, copy `.apk-backup.out` back to
 `/etc/config/` and run:
 
-Hidden script:
-
-```sh
-/etc/config/.apk-backup -r
-```
-
 Installed as an apk package:
 
 ```sh
 apk-backup -r
+```
+
+Hidden script:
+
+```sh
+/etc/config/.apk-backup -r
 ```
 
 ## License
