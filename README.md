@@ -37,8 +37,8 @@ no internet access, or you've already downloaded it for verification -
 see [Verifying a release](#verifying-a-release)):
 
 ```sh
-scp apk-backup-<version>.apk root@OpenWrt:/tmp/
-ssh openwrt
+scp-openwrt apk-backup-<version>.apk root@OpenWrt:/tmp/
+ssh-openwrt
 apk add --allow-untrusted /tmp/apk-backup-<version>.apk
 ```
 
@@ -113,8 +113,32 @@ This will:
 
 ### Verifying a release
 
+**Verify on your dev machine, not on the router.** OpenWrt does not
+ship `gpg` by default, and installing GnuPG on the router itself
+pulls in a large dependency chain that's usually not worth it just
+for one-off verification. Verify where you already have `gpg` set up
+(e.g. `uwepc`/`unuc`, the same machine used for Trezor-GPG-signed git
+commits/tags), then copy the verified `.apk` to the router.
+
 ```sh
-gpg --verify apk-backup-<version>.apk.asc apk-backup-<version>.apk
+wget https://github.com/dr-ni/apk-backup/releases/download/<TAG>/apk-backup-<VERSION>.apk
+wget https://github.com/dr-ni/apk-backup/releases/download/<TAG>/apk-backup-<VERSION>.apk.asc
+gpg --verify apk-backup-<VERSION>.apk.asc apk-backup-<VERSION>.apk
+```
+
+Expect output containing `Good signature from ...` and the key
+fingerprint `0D51A98FB69A6887ED489FC1514E25BFCC1CCF35`. If `gpg`
+doesn't already trust that key, import it first (e.g. from a keyserver
+or `gpg --export` on the signing machine) - an unknown key still
+shows `Good signature`, just with a "not certified" warning, which is
+expected unless you've explicitly trusted the key.
+
+Then copy the verified file to the router:
+
+```sh
+scp-openwrt apk-backup-<VERSION>.apk root@OpenWrt:/tmp/
+ssh-openwrt
+apk add --allow-untrusted /tmp/apk-backup-<VERSION>.apk
 ```
 
 This signs the release asset, not the apk-tools v3 package format
