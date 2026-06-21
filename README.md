@@ -95,8 +95,7 @@ ssh root@openwrt apk add --allow-untrusted /tmp/apk-backup-1.0-r1.apk
 ### Releasing a signed package (GitHub release, Trezor-signed)
 
 `pkgbuild/release.sh` builds the package and publishes it as a GitHub
-release asset with a detached GPG signature, using the same
-Trezor-backed GPG key as the onboard-osk/onboard releases.
+release asset with a detached GPG signature.
 
 ```sh
 cd pkgbuild
