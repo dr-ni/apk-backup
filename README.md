@@ -37,8 +37,8 @@ no internet access, or you've already downloaded it for verification -
 see [Verifying a release](#verifying-a-release)):
 
 ```sh
-scp apk-backup-<version>.apk root@OpenWrt:/tmp/
-ssh root@openwrt
+scp-openwrt apk-backup-<version>.apk root@OpenWrt:/tmp/
+ssh-openwrt
 apk add --allow-untrusted /tmp/apk-backup-<version>.apk
 ```
 
@@ -63,7 +63,7 @@ must be built on a separate Linux machine with a full apk-tools 3.x,
 then copied to the router for installation. No OpenWrt SDK/toolchain
 is needed either way, since this package is just a shell script.
 
-**1. Build full apk-tools 3.x on your dev machine**
+**1. Build full apk-tools 3.x on your dev machine:**
 
 ```sh
 sudo apt install meson ninja-build gcc pkg-config libssl-dev zlib1g-dev liblzma-dev libzstd-dev
@@ -88,14 +88,16 @@ This produces `apk-backup-1.0-r1.apk` in the `pkgbuild/` directory.
 **3. Copy the built package to the router and install it:**
 
 ```sh
-scp apk-backup-1.0-r1.apk root@OpenWrt:/tmp/
-ssh root@openwrt apk add --allow-untrusted /tmp/apk-backup-1.0-r1.apk
+scp-openwrt apk-backup-1.0-r1.apk root@OpenWrt:/tmp/
+ssh-openwrt
+apk add --allow-untrusted /tmp/apk-backup-1.0-r1.apk
 ```
 
 ### Releasing a signed package (GitHub release, Trezor-signed)
 
 `pkgbuild/release.sh` builds the package and publishes it as a GitHub
-release asset with a detached GPG signature.
+release asset with a detached GPG signature, using the same
+Trezor-backed GPG key as the onboard-osk/onboard releases.
 
 ```sh
 cd pkgbuild
@@ -114,9 +116,17 @@ This will:
 **Verify on your dev machine, not on the router.** OpenWrt does not
 ship `gpg` by default, and installing GnuPG on the router itself
 pulls in a large dependency chain that's usually not worth it just
-for one-off verification. Verify where you already have `gpg` set up,
-the same machine used for Trezor-GPG-signed git
-commits/tags), then copy the verified `.apk` to the router.
+for one-off verification.
+
+**1. Import the public key** (once per machine, from GitHub):
+
+```sh
+curl https://github.com/dr-ni.gpg | gpg --import
+```
+
+Key fingerprint: `0D51 A98F B69A 6887 ED48  9FC1 514E 25BF CC1C CF35`
+
+**2. Download and verify:**
 
 ```sh
 wget https://github.com/dr-ni/apk-backup/releases/download/<TAG>/apk-backup-<VERSION>.apk
@@ -124,18 +134,25 @@ wget https://github.com/dr-ni/apk-backup/releases/download/<TAG>/apk-backup-<VER
 gpg --verify apk-backup-<VERSION>.apk.asc apk-backup-<VERSION>.apk
 ```
 
-Expect output containing `Good signature from ...` and the key
-fingerprint `0D51A98FB69A6887ED489FC1514E25BFCC1CCF35`. If `gpg`
-doesn't already trust that key, import it first (e.g. from a keyserver
-or `gpg --export` on the signing machine) - an unknown key still
-shows `Good signature`, just with a "not certified" warning, which is
-expected unless you've explicitly trusted the key.
-
-Then copy the verified file to the router:
+Expect `Good signature from "Uwe Niethammer ..."`. The `[uncertain]`
+warning is normal if you haven't explicitly trusted the key in your
+GPG keyring - the signature itself is valid. To suppress it, verify
+the fingerprint above matches (`gpg --fingerprint 514E25BFCC1CCF35`)
+and then trust the key:
 
 ```sh
-scp-openwrt apk-backup-<VERSION>.apk root@OpenWrt:/tmp/
-ssh-openwrt
+gpg --edit-key 0D51A98FB69A6887ED489FC1514E25BFCC1CCF35
+gpg> trust
+Your decision? 5
+Do you really want to set this key to ultimate trust? y
+gpg> quit
+```
+
+**3. Copy the verified file to the router and install it:**
+
+```sh
+scp apk-backup-<VERSION>.apk root@OpenWrt:/tmp/
+ssh root@openwrt
 apk add --allow-untrusted /tmp/apk-backup-<VERSION>.apk
 ```
 
@@ -151,7 +168,7 @@ SSH/GPG agent interface). So `apk add` on the router still needs
 
 |                          | apk package                          | hidden script                          |
 |--------------------------|---------------------------------------|------------------------------------------|
-| Setup effort             | upload via LuCi wget or scp `apk add`                        | manual `scp` + `chmod` after every reinstall |
+| Setup effort             | upload via LuCi or scp `apk add`                        | manual `scp` + `chmod` after every reinstall |
 | Survives `sysupgrade`?   | yes - but only the backup list | yes - hidden file under `/etc/config/` |
 | On `$PATH`?              | yes - `apk-backup` from anywhere     | no - needs the full `/etc/config/.apk-backup` path |
 | Dependency tracking      | shows up in `apk info`/`apk list -I`, gets removed cleanly via `apk del` | invisible to apk, manual cleanup only |
@@ -199,7 +216,7 @@ echo '0 3 * * * /etc/config/.apk-backup -b' >> /etc/crontabs/root
 
 ### Restore after reflash
 
-After a fresh OpenWrt install, restore your LuCi backup with your `.apk-backup.out` or copy `.apk-backup.out` back via scp to
+After a fresh OpenWrt install, copy `.apk-backup.out` back to
 `/etc/config/` and run:
 
 Installed as an apk package:
