@@ -124,7 +124,13 @@ for one-off verification.
 curl https://github.com/dr-ni.gpg | gpg --import
 ```
 
-Key fingerprint: `0D51 A98F B69A 6887 ED48  9FC1 514E 25BF CC1C CF35`
+> **⚠️ Key rotation notice (2026-08-14):** the previous signing key
+> (fingerprint `0D51 A98F B69A 6887 ED48  9FC1 514E 25BF CC1C CF35`)
+> is compromised and must no longer be trusted. All releases signed
+> with it should be considered unverified until re-signed with the
+> new key below.
+
+Key fingerprint: `4561 9D30 0E9E E63B 900C  386B 2570 F1E0 1889 02EF`
 
 **2. Download and verify:**
 
@@ -137,11 +143,11 @@ gpg --verify apk-backup-<VERSION>.apk.asc apk-backup-<VERSION>.apk
 Expect `Good signature from "Uwe Niethammer ..."`. The `[uncertain]`
 warning is normal if you haven't explicitly trusted the key in your
 GPG keyring - the signature itself is valid. To suppress it, verify
-the fingerprint above matches (`gpg --fingerprint 514E25BFCC1CCF35`)
+the fingerprint above matches (`gpg --fingerprint 45619D300E9EE63B900C386B2570F1E0188902EF`)
 and then trust the key:
 
 ```sh
-gpg --edit-key 0D51A98FB69A6887ED489FC1514E25BFCC1CCF35
+gpg --edit-key 45619D300E9EE63B900C386B2570F1E0188902EF
 gpg> trust
 Your decision? 5
 Do you really want to set this key to ultimate trust? y
